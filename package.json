@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "start": "node server.js"
+  },
+  "name": "blocklab-hackathon",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "request": "^2.88.2"
+  }
+}
