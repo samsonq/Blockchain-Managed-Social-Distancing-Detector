@@ -1,13 +1,12 @@
 import numpy as np
 import cv2
-import skimage.io
 from .yolo_config import NMS_THRESH, MIN_CONF
 
 
 def detect(frame, net, ln, person_idx=0):
     """
-
-    :param frame: frame from your video file or directly from Webcam
+    Detects people within frames of inputted video.
+    :param frame: frame from your video file or directly from webcam
     :param net: pre-initialized and pre-trained YOLO object detection model
     :param ln: YOLO CNN output layer names
     :param person_idx: YOLO class to detect people

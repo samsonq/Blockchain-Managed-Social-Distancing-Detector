@@ -1,8 +1,6 @@
 import os
-import sys
 import numpy as np
 import cv2
-import skimage.io
 import argparse
 import imutils
 from scipy.spatial import distance
