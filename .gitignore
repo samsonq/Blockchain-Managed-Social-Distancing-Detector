@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 .DS_Store
 .idea/
+src/yolo-coco/yolov3.weights
