@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-from .yolo_config import NMS_THRESH, MIN_CONF
+from yolo_config import NMS_THRESH, MIN_CONF
 
 
 def detect(frame, net, ln, person_idx=0):

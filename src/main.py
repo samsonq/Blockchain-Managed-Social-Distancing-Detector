@@ -4,8 +4,8 @@ import cv2
 import argparse
 import imutils
 from scipy.spatial import distance
-from .yolo_config import *
-from .detector import detect
+from yolo_config import *
+from detector import detect
 
 
 def parse_args():
