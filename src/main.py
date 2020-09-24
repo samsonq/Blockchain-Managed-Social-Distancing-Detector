@@ -3,7 +3,11 @@ import numpy as np
 import cv2
 import argparse
 import imutils
+import mysql.connector
+from mysql.connector import Error
+from mysql.connector import errorcode
 from scipy.spatial import distance
+from datetime import datetime
 from yolo_config import *
 from detector import detect
 
@@ -27,6 +31,8 @@ def parse_args():
 def detect_social_distancing(args):
     """
     Runs model to detect social distancing between people in crowds.
+    :param args: video feed arguments
+    :return: violations
     """
     labels_path = os.path.sep.join([MODEL_PATH, "coco.names"])
     labels = open(labels_path).read().strip().split("\n")
@@ -100,6 +106,24 @@ def main():
     args = parse_args()
     detect_social_distancing(args)
 
+    x = ''
+    z = ''
+    current_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    insert_query = """INSERT INTO Distancing (Location, Local_Time, Violations) VALUES ({}{}{}) """.format(x, current_time, z)
+
+    cursor = connection.cursor()
+    cursor.execute(insert_query)
+    connection.commit()
+    cursor.close()
+
 
 if __name__ == "__main__":
+    try:
+        connection = mysql.connector.connect(host='localhost',
+                                             database='',
+                                             user='root',
+                                             password='')
+    except mysql.connector.Error as error:
+        print("Failed to insert record into table {}".format(error))
+
     main()
