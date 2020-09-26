@@ -102,7 +102,7 @@ def detect_motion(frameCount):
 
 
             # TODO: YOLO code has been commented out due to lag and bounding box issues
-            """
+            
             results = detect(frame, net, ln, person_idx=labels.index("person"))
             violate = set()
 
@@ -128,7 +128,7 @@ def detect_motion(frameCount):
                 cv2.circle(frame, (cX, cY), 5, color, 1)
             text = "Social Distancing Violations: {}".format(len(violate))
             cv2.putText(frame, text, (10, frame.shape[0] - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.85, (0, 0, 255), 3)
-            """
+            
 
 
 
