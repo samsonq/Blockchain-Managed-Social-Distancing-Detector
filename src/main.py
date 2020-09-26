@@ -21,6 +21,8 @@ def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("-i", "--input", type=str, default="",
                     help="path to (optional) input video file")
+    ap.add_argument("-l", "--location", type=str, default="",
+                    help="geo location of video feed")
     ap.add_argument("-o", "--output", type=str, default="",
                     help="path to (optional) output video file")
     ap.add_argument("-d", "--display", type=int, default=1,
@@ -98,6 +100,13 @@ def detect_social_distancing(args):
         if writer is not None:
             writer.write(frame)
 
+        #current_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        #insert_query = """INSERT INTO Distancing (Location, Local_Time, Violations) VALUES ({}, '{}', {}) """.format(args["location"], current_time, len(violate))
+        #cursor = connection.cursor()
+        #cursor.execute(insert_query)
+    #connection.commit()
+    #cursor.close()
+
 
 def main():
     """
@@ -106,21 +115,11 @@ def main():
     args = parse_args()
     detect_social_distancing(args)
 
-    x = ''
-    z = ''
-    current_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    insert_query = """INSERT INTO Distancing (Location, Local_Time, Violations) VALUES ({}{}{}) """.format(x, current_time, z)
-
-    cursor = connection.cursor()
-    cursor.execute(insert_query)
-    connection.commit()
-    cursor.close()
-
 
 if __name__ == "__main__":
     try:
         connection = mysql.connector.connect(host='localhost',
-                                             database='',
+                                             database='Maxonrow',
                                              user='root',
                                              password='')
     except mysql.connector.Error as error:

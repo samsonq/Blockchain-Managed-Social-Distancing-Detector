@@ -24,7 +24,7 @@ def detect(frame, net, ln, person_idx=0):
 
     for output in layer_outputs:
         for detection in output:
-            scores = detection[:5]
+            scores = detection[5:]
             class_id = np.argmax(scores)
             confidence = scores[class_id]
             if class_id == person_idx and confidence >= MIN_CONF:
