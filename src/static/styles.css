@@ -78,7 +78,6 @@ input[type="file"]::-webkit-file-upload-button {
 .selection-wrapper {
   display: flex;
   flex-direction: column;
-  align-items: center;
   flex-grow: 1;
 }
 
@@ -207,4 +206,12 @@ input[type="file"]::-webkit-file-upload-button {
 
 .color-grey {
   color: #9c9c9c;
+}
+
+#bodycolor {
+  background-color: #121212;
+}
+
+#slide-out {
+  background-color: #f2f9ff;
 }
