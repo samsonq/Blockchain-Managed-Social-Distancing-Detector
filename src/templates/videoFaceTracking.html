@@ -29,13 +29,13 @@
       <div class="side-by-side model-section">
         <!-- face_detector_selection_control -->
         <div class="selection-wrapper">
-          <div id="face_detector_selection_control" class="input-field">
-            <select id="selectFaceDetector">
+          <!-- <div id="face_detector_selection_control" class="input-field"> -->
+            <label>Select Distance Detection Model</label>
+            <select id="selectFaceDetector" name='models' style="display: block;">
               <option value="tiny_face_detector">ModelVersion1.0</option>
               <option value="ssd_mobilenetv1">ModelVersion2.0</option>
             </select>
-            <label>Select Distance Detection Model</label>
-          </div>
+          <!-- </div> -->
           <!-- face_detector_selection_control -->
 
           <!-- check boxes -->
@@ -48,8 +48,9 @@
           <!-- check boxes -->
 
           <!-- Input Size Selection -->
-          <div class="input-field">
-            <select id="inputSize">
+          <!-- <div class="input-field"> -->
+            <label>Input Size</label>
+            <select id="inputSize" name="inputSize" style="display: block;">
               <option value="" disabled selected>Input Size:</option>
               <option value="160">160 x 160</option>
               <option value="224">224 x 224</option>
@@ -58,9 +59,8 @@
               <option value="512">512 x 512</option>
               <option value="608">608 x 608</option>
             </select>
-            <label>Input Size</label>
             <!-- Input Size Selection -->
-          </div>
+          <!-- </div> -->
         </div>
       </div>
 
