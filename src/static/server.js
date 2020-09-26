@@ -15,9 +15,9 @@ app.use(express.static(path.join(__dirname, '../media')))
 app.use(express.static(path.join(__dirname, '../../weights')))
 app.use(express.static(path.join(__dirname, '../../dist')))
 
-app.get('/', (req, res) => res.redirect('/video_face_tracking'))
-app.get('/video_face_tracking', (req, res) => res.sendFile(path.join(viewsDir, 'videoFaceTracking.html')))
+//app.get('/', (req, res) => res.redirect('/video_face_tracking'))
 
+//app.get('/video_face_tracking', (req, res) => res.sendFile(path.join(viewsDir, 'videoFaceTracking.html')))
 
 app.post('/fetch_external_image', async (req, res) => {
   const { imageUrl } = req.body

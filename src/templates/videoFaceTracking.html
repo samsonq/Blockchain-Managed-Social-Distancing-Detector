@@ -3,10 +3,10 @@
 
 <head>
   <title>Geolocation</title>
-  <script src="face-api.js"></script>
-  <script src="js/commons.js"></script>
-  <script src="js/faceDetectionControls.js"></script>
-  <link rel="stylesheet" href="styles.css">
+  <script src="/static/face-api.js"></script>
+  <script src="/static/commons.js"></script>
+  <script src="/static/faceDetectionControls.js"></script>
+  <link rel="stylesheet" href="/static/styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.css">
   <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
@@ -18,8 +18,10 @@
     <div class="progress" id="loader">
       <div class="indeterminate"></div>
     </div>
+
     <div style="position: relative" class="video-section mx-auto">
-      <video src="bbt.MOV" id="inputVideo" autoplay muted loop playsinline></video>
+      <!--<video src="/static/bbt.MOV" id="inputVideo" autoplay muted loop playsinline></video>-->
+      <img src="{{ url_for('video_feed') }}">
       <canvas id="overlay" />
     </div>
 
