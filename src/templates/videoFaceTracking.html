@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Geolocation</title>
+  <script src="/static/face-api.js"></script>
+  <script src="/static/commons.js"></script>
+  <script src="/static/faceDetectionControls.js"></script>
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+</head>
+
+<body>
+  <div class="text-center" id="navbar"></div>
+  <div class="page-container">
+    <div class="progress" id="loader">
+      <div class="indeterminate"></div>
+    </div>
+
+    <div style="position: relative" class="video-section mx-auto">
+      <!--<video src="/static/bbt.MOV" id="inputVideo" autoplay muted loop playsinline></video>-->
+      <img src="{{ url_for('video_feed') }}">
+      <canvas id="overlay" />
+    </div>
+
+    <div class="control-wrapper">
+      <div class="side-by-side model-section">
+        <!-- face_detector_selection_control -->
+        <div class="selection-wrapper">
+          <!-- <div id="face_detector_selection_control" class="input-field"> -->
+            <label>Select Distance Detection Model</label>
+            <select id="selectFaceDetector" name='models' style="display: block;">
+              <option value="tiny_face_detector">ModelVersion1.0</option>
+              <option value="ssd_mobilenetv1">ModelVersion2.0</option>
+            </select>
+          <!-- </div> -->
+          <!-- face_detector_selection_control -->
+
+          <!-- check boxes -->
+          <div class="my-2" style="width: 220px;">
+            <input type="checkbox" id="withFaceLandmarksCheckbox" onchange="onChangeWithFaceLandmarks(event)" />
+            <label for="withFaceLandmarksCheckbox">Detect Face Landmarks</label>
+            <input type="checkbox" id="hideBoundingBoxesCheckbox" onchange="onChangeHideBoundingBoxes(event)" />
+            <label for="hideBoundingBoxesCheckbox">Hide Bounding Boxes</label>
+          </div>
+          <!-- check boxes -->
+
+          <!-- Input Size Selection -->
+          <!-- <div class="input-field"> -->
+            <label>Input Size</label>
+            <select id="inputSize" name="inputSize" style="display: block;">
+              <option value="" disabled selected>Input Size:</option>
+              <option value="160">160 x 160</option>
+              <option value="224">224 x 224</option>
+              <option value="320">320 x 320</option>
+              <option value="416">416 x 416</option>
+              <option value="512">512 x 512</option>
+              <option value="608">608 x 608</option>
+            </select>
+            <!-- Input Size Selection -->
+          <!-- </div> -->
+        </div>
+      </div>
+
+      <!-- Distance meter -->
+      <div class="distance-meter model-section-2">
+        <span class="font-italic font-12 color-grey">(For demo purpose only. </span>
+        <span class="font-italic font-12 color-grey">Measured with Euclidean Distance)</span>
+        <div class="distance-title font-bold font-16">
+          Distance
+        </div>
+        <div id="distance-value" class="mt-2">
+          0
+        </div>
+        <div id="distance-alert" class="mt-2 px-5 text-red text-center font-bold font-22 break-word">
+        </div>
+      </div>
+      <!-- Distance meter -->
+
+      <!-- fps_meter -->
+      <div id="fps_meter" class="model-section-1" style="padding-right:50px;">
+        <div>
+          <label for="time">Time:</label>
+          <input disabled value="-" id="time" type="text" class="bold">
+          <label for="fps">Estimated Fps:</label>
+          <input disabled value="-" id="fps" type="text" class="bold">
+        </div>
+      </div>
+      <!-- fps_meter -->
+    </div>
+
+    <div class="control-wrapper justify-center">
+      <!-- ssd_mobilenetv1_controls -->
+      <span id="ssd_mobilenetv1_controls" class="mb-10 mt-2 mx-5">
+        <div class="side-by-side">
+          <div>
+            <label for="minConfidence">Min Confidence:</label>
+            <input disabled value="0.5" id="minConfidence" type="text" class="bold">
+          </div>
+
+          <div class="btn-group">
+            <button class="waves-effect waves-light btn my-1" onclick="onDecreaseMinConfidence()">
+              <i class="material-icons">-</i>
+            </button>
+            <button class="waves-effect waves-light btn my-1" onclick="onIncreaseMinConfidence()">
+              <i class="material-icons">+</i>
+            </button>
+          </div>
+        </div>
+      </span>
+      <!-- ssd_mobilenetv1_controls -->
+
+      <!-- tiny_face_detector_controls -->
+      <div id="tiny_face_detector_controls" class="mb-10 mt-2 mx-5">
+        <div class="side-by-side">
+          <div class="ml-8">
+            <label for="scoreThreshold">Score Threshold:</label>
+            <input disabled value="0.5" id="scoreThreshold" type="text" class="bold">
+          </div>
+
+          <div class="btn-group">
+            <button class="waves-effect waves-light btn my-1" onclick="onDecreaseScoreThreshold()">
+              <i class="material-icons">-</i>
+            </button>
+            <button class="waves-effect waves-light btn my-1" onclick="onIncreaseScoreThreshold()">
+              <i class="material-icons">+</i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- tiny_face_detector_controls -->
+  </div>
+</body>
+
+<script>
+  let forwardTimes = []
+  let withFaceLandmarks = false
+  let withBoxes = true
+
+  function onChangeWithFaceLandmarks(e) {
+    withFaceLandmarks = $(e.target).prop('checked')
+  }
+
+  function onChangeHideBoundingBoxes(e) {
+    withBoxes = !$(e.target).prop('checked')
+  }
+
+  function updateTimeStats(timeInMs) {
+    forwardTimes = [timeInMs].concat(forwardTimes).slice(0, 30)
+    const avgTimeInMs = forwardTimes.reduce((total, t) => total + t) / forwardTimes.length
+    $('#time').val(`${Math.round(avgTimeInMs)} ms`)
+    $('#fps').val(`${faceapi.utils.round(1000 / avgTimeInMs)}`)
+  }
+
+  function updateMeter(value) {
+    $('#distance-value').text(`${value}`)
+  }
+
+  function updateAlert(value) {
+    $('#distance-alert').text(`${value}`)
+  }
+
+  function isEmpty(obj) {
+    for (var key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  function isUndefinedOrNullOrEmpty(value) {
+    if (null === value || undefined === value) return true;
+    if ('string' === typeof value) {
+      if ('' == value) return true;
+      return false;
+    }
+
+    if ('number' === typeof value) return false;
+
+    if ('object' === typeof value) {
+      if (Array.isArray(value)) {
+        if (0 >= value.length) return true;
+        return false;
+      }
+
+      if (0 >= Object.keys(value).length) return true;
+      return false;
+    }
+
+    return true;
+  };
+
+  async function onPlay(videoEl) {
+    if (!videoEl.currentTime || videoEl.paused || videoEl.ended || !isFaceDetectionModelLoaded())
+      return setTimeout(() => onPlay(videoEl))
+
+
+    const options = getFaceDetectorOptions()
+
+    const ts = Date.now()
+
+    const drawBoxes = withBoxes
+    const drawLandmarks = withFaceLandmarks
+
+    let task = faceapi.detectAllFaces(videoEl, options);
+    task = withFaceLandmarks ? task.withFaceLandmarks() : task
+    const results = await task
+    if (!isUndefinedOrNullOrEmpty(results[0]) && !isUndefinedOrNullOrEmpty(results[1])) {
+      let x1 = '';
+      let x2 = '';
+      let y1 = '';
+      let y2 = '';
+      if (withFaceLandmarks && !isUndefinedOrNullOrEmpty(results[0].detection)) {
+        x1 = results[0].detection.box.x;
+        x2 = results[1].detection.box.x;
+        y1 = results[0].detection.box.y;
+        y2 = results[1].detection.box.y;
+      } else {
+        if (!isUndefinedOrNullOrEmpty(results[0].box)) {
+          x1 = results[0].box.x;
+          x2 = results[1].box.x;
+          y1 = results[0].box.y;
+          y2 = results[1].box.y;
+        }
+      }
+      const dist = faceapi.euclideanDistance([x1, y1], [x2, y2]);
+      updateMeter((dist / 730).toFixed(2) + 'm');
+      if (dist < 730) {
+        updateAlert(`Alert! Distance less than 1 meter.`);
+      } else {
+        updateAlert("");
+      }
+    } else {
+      updateMeter(0);
+      updateAlert("");
+    }
+
+    updateTimeStats(Date.now() - ts)
+
+    const canvas = $('#overlay').get(0)
+    const dims = faceapi.matchDimensions(canvas, videoEl, true)
+
+    const resizedResults = faceapi.resizeResults(results, dims)
+    if (drawBoxes) {
+      faceapi.draw.drawDetections(canvas, resizedResults)
+    }
+    if (drawLandmarks) {
+      faceapi.draw.drawFaceLandmarks(canvas, resizedResults)
+    }
+
+    setTimeout(() => onPlay(videoEl))
+  }
+
+  async function run() {
+    // load face detection and face landmark models
+    await changeFaceDetector(TINY_FACE_DETECTOR)
+    await faceapi.loadFaceLandmarkModel('/')
+    changeInputSize(416)
+
+    // start processing frames
+    onPlay($('#inputVideo').get(0))
+  }
+
+  function updateResults() { }
+
+  $(document).ready(function () {
+    renderNavBar('#navbar', 'video_face_tracking')
+    initFaceDetectionControls()
+    run()
+  })
+</script>
+</body>
+
+</html>

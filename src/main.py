@@ -3,9 +3,9 @@ import numpy as np
 import cv2
 import argparse
 import imutils
-import mysql.connector
-from mysql.connector import Error
-from mysql.connector import errorcode
+#import mysql.connector
+#from mysql.connector import Error
+#from mysql.connector import errorcode
 from scipy.spatial import distance
 from datetime import datetime
 from yolo_config import *
@@ -117,6 +117,7 @@ def main():
 
 
 if __name__ == "__main__":
+    """
     try:
         connection = mysql.connector.connect(host='localhost',
                                              database='Maxonrow',
@@ -124,5 +125,5 @@ if __name__ == "__main__":
                                              password='')
     except mysql.connector.Error as error:
         print("Failed to insert record into table {}".format(error))
-
+    """
     main()
