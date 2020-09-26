@@ -6,6 +6,7 @@ from scipy.spatial import distance
 from imutils.video import VideoStream
 from flask import Flask, request, send_from_directory
 from flask import Response
+from flask import url_for, redirect
 from flask import render_template
 import threading
 import argparse
@@ -41,6 +42,10 @@ def get_file(filename):  # pragma: no cover
 
 @app.route("/")
 def index():
+    return redirect(url_for("video_face_tracking"))
+
+@app.route("/video_face_tracking")
+def video_face_tracking():
     # return the rendered template
     return render_template("videoFaceTracking.html")
     #content = get_file('templates/videoFaceTracking.html')
