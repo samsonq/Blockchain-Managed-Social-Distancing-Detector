@@ -1,7 +1,7 @@
 import numpy as np
 import imutils
 import cv2
-from detector import detect
+from detector import Detector
 from scipy.spatial import distance
 from imutils.video import VideoStream
 from flask import Flask, request, send_from_directory
@@ -28,11 +28,11 @@ lock = threading.Lock()
 #app = Flask(__name__, template_folder='server/views', static_url_path='')
 app = Flask(__name__)
 
-
 # initialize the video stream
 #vs = VideoStream(src=0).start()
 vs = cv2.VideoCapture("static/test.mp4")
 time.sleep(2.0)
+
 
 def get_file(filename):  # pragma: no cover
     try:
@@ -40,9 +40,11 @@ def get_file(filename):  # pragma: no cover
     except IOError as exc:
         return str(exc)
 
+
 @app.route("/")
 def index():
     return redirect(url_for("video_face_tracking"))
+
 
 @app.route("/video_face_tracking")
 def video_face_tracking():
@@ -51,13 +53,13 @@ def video_face_tracking():
     #content = get_file('templates/videoFaceTracking.html')
     #return Response(content, mimetype="text/html")
 
+
 def detect_motion(frameCount):
     labels_path = os.path.sep.join([MODEL_PATH, "coco.names"])
     weights_path = os.path.sep.join([MODEL_PATH, "yolov3.weights"])
     config_path = os.path.sep.join([MODEL_PATH, "yolov3.cfg"])
 
     labels = open(labels_path).read().strip().split("\n")
-
     net = cv2.dnn.readNetFromDarknet(config_path, weights_path)
 
     if USE_GPU:
@@ -69,7 +71,6 @@ def detect_motion(frameCount):
     ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
 
     writer = None
-
 
     # grab global references to the video stream, output frame, and lock variables
     global vs, outputFrame, lock
@@ -97,13 +98,8 @@ def detect_motion(frameCount):
                 break
             # resize the frame and then detect people (and only people) in it
             frame = imutils.resize(frame, width=700)
-
-
-
-
-            # TODO: YOLO code has been commented out due to lag and bounding box issues
             
-            results = detect(frame, net, ln, person_idx=labels.index("person"))
+            results = Detector.detect(frame, net, ln, person_idx=labels.index("person"))
             violate = set()
 
             if len(results) >= 2:
@@ -128,10 +124,6 @@ def detect_motion(frameCount):
                 cv2.circle(frame, (cX, cY), 5, color, 1)
             text = "Social Distancing Violations: {}".format(len(violate))
             cv2.putText(frame, text, (10, frame.shape[0] - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.85, (0, 0, 255), 3)
-            
-
-
-
 
             # acquire the lock, set the output frame, and release the
             # lock
@@ -156,36 +148,30 @@ def generate():
             if not flag:
                 continue
         # yield the output frame in the byte format
-        yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + 
-            bytearray(encodedImage) + b'\r\n')
+        yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
 
 
 @app.route("/video_feed")
 def video_feed():
     # return the response generated along with the specific media
     # type (mime type)
-    return Response(generate(),
-        mimetype = "multipart/x-mixed-replace; boundary=frame")
+    return Response(generate(), mimetype="multipart/x-mixed-replace; boundary=frame")
+
 
 # check to see if this is the main thread of execution
 if __name__ == '__main__':
     # construct the argument parser and parse command line arguments
     ap = argparse.ArgumentParser()
-    ap.add_argument("-i", "--ip", type=str, required=True,
-        help="ip address of the device")
-    ap.add_argument("-o", "--port", type=int, required=True,
-        help="ephemeral port number of the server (1024 to 65535)")
-    ap.add_argument("-f", "--frame-count", type=int, default=32,
-        help="# of frames used to construct the background model")
+    ap.add_argument("-i", "--ip", type=str, required=True, help="ip address of the device")
+    ap.add_argument("-o", "--port", type=int, required=True, help="ephemeral port number of the server (1024 to 65535)")
+    ap.add_argument("-f", "--frame-count", type=int, default=32, help="# of frames used to construct the background model")
     args = vars(ap.parse_args())
     # start a thread that will perform motion detection
-    t = threading.Thread(target=detect_motion, args=(
-        args["frame_count"],))
+    t = threading.Thread(target=detect_motion, args=(args["frame_count"],))
     t.daemon = True
     t.start()
     # start the flask app
-    app.run(host=args["ip"], port=args["port"], debug=True,
-        threaded=True, use_reloader=False)
+    app.run(host=args["ip"], port=args["port"], debug=True, threaded=True, use_reloader=False)
+
 # release the video stream pointer
 vs.stop()
-
