@@ -45,6 +45,13 @@ def get_file(filename):  # pragma: no cover
 def index():
     return redirect(url_for("video_face_tracking"))
 
+@app.route("/set_confidence/<confidence>", methods=['POST'])
+def set_confidence(confidence):
+    MIN_CONF = confidence
+
+@app.route("/set_min_distance/<distance>", methods=['POST'])
+def set_min_distance(distance):
+    MIN_DISTANCE = distance
 
 @app.route("/video_face_tracking")
 def video_face_tracking():
@@ -76,7 +83,7 @@ def detect_motion(frameCount):
     global vs, outputFrame, lock
     
     frame_counter = 0
-    frame_rate = 30
+    frame_rate = 100
     prev = 0
 
     # loop over frames from the video stream
@@ -125,8 +132,7 @@ def detect_motion(frameCount):
             text = "Social Distancing Violations: {}".format(len(violate))
             cv2.putText(frame, text, (10, frame.shape[0] - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.85, (0, 0, 255), 3)
 
-            # acquire the lock, set the output frame, and release the
-            # lock
+            # acquire the lock, set the output frame, and release the lock
             with lock:
                 outputFrame = frame.copy()
 
