@@ -5,6 +5,10 @@ import cv2
 import imutils
 from scipy.spatial import distance
 from yolo_config import *
+from datetime import datetime
+from hashlib import sha256
+from on_chain import OnChain
+from off_chain import OffChain
 
 
 class Detector:
@@ -14,6 +18,8 @@ class Detector:
         self.vid_output = vid_output
         self.location = location
         self.display = display
+        self.off_chain = OffChain()
+        self.on_chain = OnChain()
 
     @staticmethod
     def detect(frame, net, ln, person_idx=0):
@@ -127,9 +133,16 @@ class Detector:
             if writer is not None:
                 writer.write(frame)
 
-            # current_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-            # insert_query = """INSERT INTO Distancing (Location, Local_Time, Violations) VALUES ({}, '{}', {}) """.format(args["location"], current_time, len(violate))
-            # cursor = connection.cursor()
-            # cursor.execute(insert_query)
+
+            # On/Off chain stuff #
+            current_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+            insert_query = """INSERT INTO Distancing (Location, Local_Time, Violations) VALUES ({}, '{}', {}) """.format(self.location, current_time, len(violate))
+            self.off_chain.insert(insert_query)
+
+            select_query = """SELECT """
+            event = self.off_chain.select(select_query)
+
+            event_str = event[0][0] + self.location + current_time + len(violate)
+            event_hash = sha256(event_str.encode()).hexdigest()
         # connection.commit()
         # cursor.close()

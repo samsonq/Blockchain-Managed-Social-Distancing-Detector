@@ -2,14 +2,9 @@ import os
 import sys
 import numpy as np
 import argparse
-#import mysql.connector
-#from mysql.connector import Error
-#from mysql.connector import errorcode
-from datetime import datetime
 from yolo_config import *
 from detector import Detector
 from web3 import Web3
-from hashlib import sha256
 
 web3 = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/7fc9b313b47d488c97c52c3221344c04"))
 
@@ -42,13 +37,4 @@ def main():
 
 
 if __name__ == "__main__":
-    """
-    try:
-        connection = mysql.connector.connect(host='localhost',
-                                             database='Maxonrow',
-                                             user='root',
-                                             password='')
-    except mysql.connector.Error as error:
-        print("Failed to insert record into table {}".format(error))
-    """
     main()
