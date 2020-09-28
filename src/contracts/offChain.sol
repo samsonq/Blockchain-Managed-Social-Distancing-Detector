@@ -3,14 +3,16 @@ pragma solidity >=0.4.21 <0.6.0;
 import "./common/SafeMath.sol";
 import "./common/Ownable.sol";
 import "./common/Destructible.sol";
-import "./provableAPI_0.5.sol";
 
-contract offChain is usingProvable, Ownable, Destructible {
+
+contract offChain is Ownable, Destructible {
 
     using SafeMath for uint256;
     address public owner;
     uint public balance;
-    event LogNewProvableQuery(string description);
+    //string[] memory private event_hashes;
+    mapping (string => address) private eventHashes;
+
     event Balance(uint amount, uint moneyNeeded);
     event QueryRes(string result);
 
@@ -18,30 +20,16 @@ contract offChain is usingProvable, Ownable, Destructible {
         owner = msg.sender;
     }
 
-    function __callback(bytes32 myid, string memory result) public {
-       if (msg.sender != provable_cbAddress()) revert("Not Enough Funds");
-       res = result;
-       emit QueryRes(res);
-   }
-
-    function() payable external {}
-
-    modifier onlyOwner() {
-        require(msg.sender == owner);
-        _;
+    function _addEvent(string memory hash) public {
+        eventHashes.push(hash);
     }
 
-    function queryDB() public payable {
-       //emit Balance(address(this).balance, provable_getPrice("URL"));
-       if (provable_getPrice("URL") > address(this).balance) {
-           emit LogNewProvableQuery("Provable query was NOT sent, please add some ETH to cover for the query fee");
-       } else {
-           emit LogNewProvableQuery("Provable query was sent, standing by for the answer..");
-           provable_query("URL", "json(https://purple-elephant-56.localtunnel.me/1/Danny).name");
-       }
-   }
-
-    function getRes() public view returns (string memory) {
-        return res;
+    function _verifyEvent(string eventInfo) public view returns(bool) {
+        string hash = sha256(abi.encodePacked(eventInfo));
+        if (eventHashes[x].exists == true) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

@@ -136,7 +136,7 @@ class Detector:
 
             # On/Off chain stuff #
             current_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-            insert_query = """INSERT INTO Distancing (Location, Local_Time, Violations) VALUES ({}, '{}', {}) """.format(self.location, current_time, len(violate))
+            insert_query = """INSERT INTO Distancing (Location, Local_Time, Violations) VALUES ({}, '{}', {})""".format(self.location, current_time, len(violate))
             self.off_chain.insert(insert_query)
 
             select_query = """SELECT """
