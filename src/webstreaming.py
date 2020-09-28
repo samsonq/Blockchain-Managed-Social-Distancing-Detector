@@ -44,6 +44,14 @@ def get_file(filename):  # pragma: no cover
 def index():
     return redirect(url_for("video_face_tracking"))
 
+@app.route("/set_confidence/<confidence>", methods=['POST'])
+def set_confidence(confidence):
+    MIN_CONF = confidence
+
+@app.route("/set_min_distance/<distance>", methods=['POST'])
+def set_min_distance(distance):
+    MIN_DISTANCE = distance
+
 @app.route("/video_face_tracking")
 def video_face_tracking():
     # return the rendered template
@@ -75,7 +83,7 @@ def detect_motion(frameCount):
     global vs, outputFrame, lock
     
     frame_counter = 0
-    frame_rate = 30
+    frame_rate = 100
     prev = 0
 
     # loop over frames from the video stream
@@ -100,9 +108,6 @@ def detect_motion(frameCount):
 
 
 
-
-            # TODO: YOLO code has been commented out due to lag and bounding box issues
-            
             results = detect(frame, net, ln, person_idx=labels.index("person"))
             violate = set()
 
@@ -133,8 +138,7 @@ def detect_motion(frameCount):
 
 
 
-            # acquire the lock, set the output frame, and release the
-            # lock
+            # acquire the lock, set the output frame, and release the lock
             with lock:
                 outputFrame = frame.copy()
 
