@@ -1,10 +1,12 @@
 import os
 import sys
 import numpy as np
+import warnings
 import argparse
 from yolo_config import *
 from detector import Detector
 from web3 import Web3
+warnings.filterwarnings("ignore")
 
 web3 = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/7fc9b313b47d488c97c52c3221344c04"))
 
