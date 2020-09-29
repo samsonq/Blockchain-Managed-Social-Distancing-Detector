@@ -56,23 +56,6 @@ def video_face_tracking():
     return render_template("videoFaceTracking.html")
 
 def update_video(frameCount):
-    labels_path = os.path.sep.join([MODEL_PATH, "coco.names"])
-    weights_path = os.path.sep.join([MODEL_PATH, "yolov3.weights"])
-    config_path = os.path.sep.join([MODEL_PATH, "yolov3.cfg"])
-
-    labels = open(labels_path).read().strip().split("\n")
-    net = cv2.dnn.readNetFromDarknet(config_path, weights_path)
-
-    if USE_GPU:
-        print("[INFO] setting preferable backend and target to CUDA...")
-        net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
-        net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
-
-    ln = net.getLayerNames()
-    ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
-
-    writer = None
-
     # grab global references to the video stream, output frame, and lock variables
     global vs, outputFrame, lock
     
@@ -94,7 +77,7 @@ def update_video(frameCount):
                 frame_counter = 0 #Or whatever as long as it is the same as next line
                 vs.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
-            (grabbed, frame, violate) = social_distancing_detector.detect_violations(vs, net, ln, labels)
+            (grabbed, frame, violate) = social_distancing_detector.detect_violations()
             if not grabbed:
                 break
 

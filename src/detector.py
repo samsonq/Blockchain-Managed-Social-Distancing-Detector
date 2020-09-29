@@ -18,6 +18,24 @@ class Detector:
         self.vid_output = vid_output
         self.location = location
         self.display = display
+
+        self.vs = cv2.VideoCapture(self.vid_input if self.vid_input else 0)
+        
+        labels_path = os.path.sep.join([MODEL_PATH, "coco.names"])
+        self.labels = open(labels_path).read().strip().split("\n")
+
+        weights_path = os.path.sep.join([MODEL_PATH, "yolov3.weights"])
+        config_path = os.path.sep.join([MODEL_PATH, "yolov3.cfg"])
+
+        self.net = cv2.dnn.readNetFromDarknet(config_path, weights_path)
+
+        if USE_GPU:
+            print("[INFO] setting preferable backend and target to CUDA...")
+            net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+            net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
+
+        ln = self.net.getLayerNames()
+        self.ln = [ln[i[0] - 1] for i in self.net.getUnconnectedOutLayers()]
         #self.off_chain = OffChain()
         #self.on_chain = OnChain()
 
@@ -65,15 +83,15 @@ class Detector:
                 results.append(r)
         return results
 
-    def detect_violations(self, vs, net, ln, labels):
+    def detect_violations(self):
         violate = set()
         # read the next frame from the file
-        (grabbed, frame) = vs.read()
+        (grabbed, frame) = self.vs.read()
         if not grabbed:
             return (grabbed, frame, violate)
         # resize the frame and then detect people (and only people) in it
         frame = imutils.resize(frame, width=700)
-        results = Detector.detect(frame, net, ln, person_idx=labels.index("person"))
+        results = Detector.detect(frame, self.net, self.ln, person_idx=self.labels.index("person"))
         
         if len(results) >= 2:
             # extract centroids from results and compute Euclidean distances between all pairs of centroids
@@ -103,27 +121,10 @@ class Detector:
         """
         Runs model to detect social distancing between people in crowds.
         """
-        labels_path = os.path.sep.join([MODEL_PATH, "coco.names"])
-        labels = open(labels_path).read().strip().split("\n")
-
-        weights_path = os.path.sep.join([MODEL_PATH, "yolov3.weights"])
-        config_path = os.path.sep.join([MODEL_PATH, "yolov3.cfg"])
-
-        net = cv2.dnn.readNetFromDarknet(config_path, weights_path)
-
-        if USE_GPU:
-            print("[INFO] setting preferable backend and target to CUDA...")
-            net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
-            net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
-
-        ln = net.getLayerNames()
-        ln = [ln[i[0] - 1] for i in net.getUnconnectedOutLayers()]
-
-        vs = cv2.VideoCapture(self.vid_input if self.vid_input else 0)
         writer = None
 
         while True:
-            (grabbed, frame, violate)  = self.detect_violations(vs, net, ln, labels)
+            (grabbed, frame, violate)  = self.detect_violations()
             if not grabbed:
                 break
 
