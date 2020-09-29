@@ -17,8 +17,8 @@ warnings.filterwarnings("ignore")
 vs = None
 outputFrame = None
 lock = threading.Lock()
+web3 = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/7fc9b313b47d488c97c52c3221344c04"))
 
-# initialize a flask object
 app = Flask(__name__)
 
 @app.route("/")
@@ -41,54 +41,39 @@ def video_face_tracking():
 def video_feed():
     return Response(generate(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
-
-web3 = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/7fc9b313b47d488c97c52c3221344c04"))
-
 def update_video(detector, frame_rate):
-    # grab global references to the video stream, output frame, and lock variables
     global vs, outputFrame, lock
     
     frame_counter = 0
     prev = 0
 
-    # loop over frames from the video stream
     while True:
         time_elapsed = time.time() - prev
         if time_elapsed > 1./frame_rate:
             prev = time.time()
 
-            #If the last frame is reached, reset the capture and the frame_counter
             frame_counter += 1
             if frame_counter >= int(vs.get(cv2.CAP_PROP_FRAME_COUNT)) - 10:
-                frame_counter = 0 #Or whatever as long as it is the same as next line
+                frame_counter = 0 
                 vs.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
             (grabbed, frame, violate) = detector.detect_violations()
             if not grabbed:
                 break
 
-            # acquire the lock, set the output frame, and release the lock
             with lock:
                 outputFrame = frame.copy()
 
-
 def generate():
-    # grab global references to the output frame and lock variables
     global outputFrame, lock
-    # loop over frames from the output stream
+    
     while True:
-        # wait until the lock is acquired
         with lock:
-            # check if the output frame is available, otherwise skip
-            # the iteration of the loop
             if outputFrame is None:
                 continue
-            # encode the frame in JPEG format
             (flag, encodedImage) = cv2.imencode(".jpg", outputFrame)
-            # ensure the frame was successfully encoded
             if not flag:
                 continue
-        # yield the output frame in the byte format
         yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
 
 
@@ -119,22 +104,21 @@ def parse_args():
 
 
 def main():
-    global vs
     """
     Runs social distancing detector.
     """
+    global vs
+
     args = parse_args()
     social_distancing_detector = Detector(args["input"], args["output"], args["location"], args["display"])
 
     if args["web"] == 1:
-        # initialize the video stream
         vs = cv2.VideoCapture(args["input"] if args["input"] else 0)
         time.sleep(2.0)
 
-        # start a thread that will perform motion detection
         t = threading.Thread(target=update_video, args=(social_distancing_detector, args["frame_rate"]))
         t.daemon = True
-        t.start()    # start the flask app
+        t.start()
         app.run(host=args["ip"], port=args["port"], debug=True, threaded=True, use_reloader=False)
     else:
         social_distancing_detector.detect_social_distancing()
