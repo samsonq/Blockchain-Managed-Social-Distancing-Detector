@@ -5,9 +5,7 @@ from detector import Detector
 from scipy.spatial import distance
 from imutils.video import VideoStream
 from flask import Flask, request, send_from_directory
-from flask import Response
-from flask import url_for, redirect
-from flask import render_template
+from flask import Response, url_for, redirect, render_template
 import threading
 import argparse
 import datetime
@@ -27,11 +25,9 @@ outputFrame = None
 lock = threading.Lock()
 
 # initialize a flask object
-#app = Flask(__name__, template_folder='server/views', static_url_path='')
 app = Flask(__name__)
 
 # initialize the video stream
-#vs = VideoStream(src=0).start()
 vs = cv2.VideoCapture("static/test.mp4")
 time.sleep(2.0)
 
@@ -57,13 +53,9 @@ def set_min_distance(distance):
 
 @app.route("/video_face_tracking")
 def video_face_tracking():
-    # return the rendered template
     return render_template("videoFaceTracking.html")
-    #content = get_file('templates/videoFaceTracking.html')
-    #return Response(content, mimetype="text/html")
 
-
-def detect_motion(frameCount):
+def update_video(frameCount):
     labels_path = os.path.sep.join([MODEL_PATH, "coco.names"])
     weights_path = os.path.sep.join([MODEL_PATH, "yolov3.weights"])
     config_path = os.path.sep.join([MODEL_PATH, "yolov3.cfg"])
@@ -88,9 +80,10 @@ def detect_motion(frameCount):
     frame_rate = 100
     prev = 0
 
+    social_distancing_detector = Detector(0, 0, "location", 0)
+
     # loop over frames from the video stream
     while True:
-
         time_elapsed = time.time() - prev
         if time_elapsed > 1./frame_rate:
             prev = time.time()
@@ -101,38 +94,9 @@ def detect_motion(frameCount):
                 frame_counter = 0 #Or whatever as long as it is the same as next line
                 vs.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
-            # read the next frame from the video stream, resize it
-            (grabbed, frame) = vs.read()
+            (grabbed, frame, violate) = social_distancing_detector.detect_violations(vs, net, ln, labels)
             if not grabbed:
                 break
-            # resize the frame and then detect people (and only people) in it
-            frame = imutils.resize(frame, width=700)
-            
-            results = Detector.detect(frame, net, ln, person_idx=labels.index("person"))
-            violate = set()
-
-            if len(results) >= 2:
-                # extract centroids from results and compute Euclidean distances between all pairs of centroids
-                centroids = np.array([r[2] for r in results])
-                dist = distance.cdist(centroids, centroids, metric="euclidean")
-                # loop over the upper triangular of the distance matrix
-                for i in range(0, dist.shape[0]):
-                    for j in range(i + 1, dist.shape[1]):
-                        if dist[i, j] <= MIN_DISTANCE:
-                            violate.add(i)
-                            violate.add(j)
-            
-            # visualize social distancing
-            for (i, (prob, bbox, centroid)) in enumerate(results):
-                (startX, startY, endX, endY) = bbox
-                (cX, cY) = centroid
-                color = (0, 255, 0)
-                if i in violate:
-                    color = (0, 0, 255)
-                cv2.rectangle(frame, (startX, startY), (endX, endY), color, 2)
-                cv2.circle(frame, (cX, cY), 5, color, 1)
-            text = "Social Distancing Violations: {}".format(len(violate))
-            cv2.putText(frame, text, (10, frame.shape[0] - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.85, (0, 0, 255), 3)
 
             # acquire the lock, set the output frame, and release the lock
             with lock:
@@ -175,7 +139,7 @@ if __name__ == '__main__':
     ap.add_argument("-f", "--frame-count", type=int, default=32, help="# of frames used to construct the background model")
     args = vars(ap.parse_args())
     # start a thread that will perform motion detection
-    t = threading.Thread(target=detect_motion, args=(args["frame_count"],))
+    t = threading.Thread(target=update_video, args=(args["frame_count"],))
     t.daemon = True
     t.start()
     # start the flask app
