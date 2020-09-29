@@ -18,7 +18,6 @@ class Detector:
         self.vid_output = vid_output
         self.location = location
         self.display = display
-
         self.vs = cv2.VideoCapture(self.vid_input if self.vid_input else 0)
         
         labels_path = os.path.sep.join([MODEL_PATH, "coco.names"])

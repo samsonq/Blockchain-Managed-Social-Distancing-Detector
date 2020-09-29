@@ -7,12 +7,10 @@ import imutils
 import time
 import warnings
 import argparse
-
 from detector import Detector
 from imutils.video import VideoStream
 from flask import Flask, Response, url_for, redirect, render_template
 from yolo_config import *
-from detector import Detector
 from web3 import Web3
 warnings.filterwarnings("ignore")
 
@@ -46,14 +44,12 @@ def video_feed():
 
 web3 = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/7fc9b313b47d488c97c52c3221344c04"))
 
-def update_video(frame_rate):
+def update_video(detector, frame_rate):
     # grab global references to the video stream, output frame, and lock variables
     global vs, outputFrame, lock
     
     frame_counter = 0
     prev = 0
-
-    social_distancing_detector = Detector(0, 0, "location", 0)
 
     # loop over frames from the video stream
     while True:
@@ -67,7 +63,7 @@ def update_video(frame_rate):
                 frame_counter = 0 #Or whatever as long as it is the same as next line
                 vs.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
-            (grabbed, frame, violate) = social_distancing_detector.detect_violations()
+            (grabbed, frame, violate) = detector.detect_violations()
             if not grabbed:
                 break
 
@@ -132,11 +128,11 @@ def main():
 
     if args["web"] == 1:
         # initialize the video stream
-        vs = cv2.VideoCapture(args["input"])
+        vs = cv2.VideoCapture(args["input"] if args["input"] else 0)
         time.sleep(2.0)
 
         # start a thread that will perform motion detection
-        t = threading.Thread(target=update_video, args=(args["frame_rate"],))
+        t = threading.Thread(target=update_video, args=(social_distancing_detector, args["frame_rate"]))
         t.daemon = True
         t.start()    # start the flask app
         app.run(host=args["ip"], port=args["port"], debug=True, threaded=True, use_reloader=False)
