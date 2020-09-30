@@ -15,9 +15,6 @@
 <body id='bodycolor'>
   <div class="text-center" id="navbar"></div>
   <div class="page-container blue-text text-darken-1">
-    <div class="progress teal accent-3" id="loader">
-      <div class="indeterminate blue darken-4"></div>
-    </div>
 
     <div style="position: relative" class="video-section mx-auto">
       <!--<video src="/static/bbt.MOV" id="inputVideo" autoplay muted loop playsinline></video>-->
@@ -65,10 +62,10 @@
       </div>
 
       <!-- Distance meter -->
-      <div class="distance-meter model-section-2">
+      <div class="distance-meter model-section-2" style="font-size: 30px;">
         <!-- <span class="font-italic font-12 color-grey">(For demo purpose only. </span>
         <span class="font-italic font-12 color-grey">Measured with Euclidean Distance)</span> -->
-        <div class="distance-title font-bold font-16 blue-text text-darken-1">
+        <div class="distance-title font-bold font-48 blue-text text-darken-1">
           Euclidean Distance
         </div>
         <div id="distance-value" class="mt-2" style="color: #1de9b6;">
@@ -141,7 +138,7 @@
   let withBoxes = true
 
   function onIncreaseMinConfidence(e) {
-    var n = parseFloat(document.getElementById("minConfidence").value) * 100
+    var n = parseInt(document.getElementById("minConfidence").value) * 100
     if(n < 100){
       n += 10
       document.getElementById("minConfidence").value = n/100
@@ -149,7 +146,7 @@
   }
 
   function onDecreaseMinConfidence(e) {
-    var n = parseFloat(document.getElementById("minConfidence").value) * 100
+    var n = parseInt(document.getElementById("minConfidence").value) * 100
     if(n > 10){
       n -= 10
       document.getElementById("minConfidence").value = n/100
@@ -157,7 +154,7 @@
   }
 
   function onIncreaseScoreThreshold(e) {
-    var n = parseFloat(document.getElementById("scoreThreshold").value) * 100
+    var n = parseInt(document.getElementById("scoreThreshold").value) * 100
     if(n < 100){
       n += 10
       document.getElementById("scoreThreshold").value = n/100
@@ -165,7 +162,7 @@
   }
 
   function onDecreaseScoreThreshold(e) {
-    var n = parseFloat(document.getElementById("scoreThreshold").value) * 100
+    var n = parseInt(document.getElementById("scoreThreshold").value) * 100
     if(n > 10){
       n -= 10
       document.getElementById("scoreThreshold").value = n/100
