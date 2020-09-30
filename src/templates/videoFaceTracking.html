@@ -138,10 +138,16 @@
   let withBoxes = true
 
   function onIncreaseMinConfidence(e) {
+    console.log("increase")
     var n = parseInt(document.getElementById("minConfidence").value) * 100
     if(n < 100){
       n += 10
       document.getElementById("minConfidence").value = n/100
+
+      $.ajax({
+        type: "POST",
+        url: "/set_confidence/" + document.getElementById("minConfidence").value
+      })
     }
   }
 
@@ -150,6 +156,11 @@
     if(n > 10){
       n -= 10
       document.getElementById("minConfidence").value = n/100
+
+      $.ajax({
+        type: "POST",
+        url: "/set_confidence/" + document.getElementById("minConfidence").value
+      })
     }
   }
 
@@ -158,6 +169,11 @@
     if(n < 100){
       n += 10
       document.getElementById("scoreThreshold").value = n/100
+
+      $.ajax({
+        type: "POST",
+        url: "/set_min_distance/" + document.getElementById("scoreThreshold").value
+      })
     }
   }
 
@@ -166,6 +182,11 @@
     if(n > 10){
       n -= 10
       document.getElementById("scoreThreshold").value = n/100
+
+      $.ajax({
+        type: "POST",
+        url: "/set_min_distance/" + document.getElementById("scoreThreshold").value
+      })
     }
   }
 

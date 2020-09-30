@@ -27,11 +27,15 @@ def index():
 
 @app.route("/set_confidence/<confidence>", methods=['POST'])
 def set_confidence(confidence):
-    MIN_CONF = confidence
+    min_conf[0] = float(confidence)
+    print("set confidence: " + str(confidence))
+    return Response(status = 200)
 
 @app.route("/set_min_distance/<distance>", methods=['POST'])
 def set_min_distance(distance):
-    MIN_DISTANCE = distance
+    min_distance[0] = float(distance)
+    print("set distance: " + str(distance))
+    return Response(status = 200)
 
 @app.route("/video_face_tracking")
 def video_face_tracking():

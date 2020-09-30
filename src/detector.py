@@ -63,7 +63,7 @@ class Detector:
                 scores = detection[5:]
                 class_id = np.argmax(scores)
                 confidence = scores[class_id]
-                if class_id == person_idx and confidence >= MIN_CONF:
+                if class_id == person_idx and confidence >= min_conf[0]:
                     box = detection[0:4] * np.array([w, h, w, h])
                     (centerX, centerY, width, height) = box.astype("int")
                     x = int(centerX - (width / 2))
@@ -72,7 +72,7 @@ class Detector:
                     centroids.append((centerX, centerY))
                     confidences.append(float(confidence))
 
-        ids = cv2.dnn.NMSBoxes(boxes, confidences, MIN_CONF, NMS_THRESH)
+        ids = cv2.dnn.NMSBoxes(boxes, confidences, min_conf[0], NMS_THRESH)
         if len(ids) > 0:
             for i in ids.flatten():
                 # extract the bounding box coordinates
@@ -95,7 +95,7 @@ class Detector:
             dist = distance.cdist(centroids, centroids, metric="euclidean")
             for i in range(0, dist.shape[0]):
                 for j in range(i + 1, dist.shape[1]):
-                    if dist[i, j] <= MIN_DISTANCE:
+                    if dist[i, j] <= min_distance[0]:
                         violate.add(i)
                         violate.add(j)
 
