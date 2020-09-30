@@ -140,6 +140,38 @@
   let withFaceLandmarks = false
   let withBoxes = true
 
+  function onIncreaseMinConfidence(e) {
+    var n = parseFloat(document.getElementById("minConfidence").value) * 100
+    if(n < 100){
+      n += 10
+      document.getElementById("minConfidence").value = n/100
+    }
+  }
+
+  function onDecreaseMinConfidence(e) {
+    var n = parseFloat(document.getElementById("minConfidence").value) * 100
+    if(n > 10){
+      n -= 10
+      document.getElementById("minConfidence").value = n/100
+    }
+  }
+
+  function onIncreaseScoreThreshold(e) {
+    var n = parseFloat(document.getElementById("scoreThreshold").value) * 100
+    if(n < 100){
+      n += 10
+      document.getElementById("scoreThreshold").value = n/100
+    }
+  }
+
+  function onDecreaseScoreThreshold(e) {
+    var n = parseFloat(document.getElementById("scoreThreshold").value) * 100
+    if(n > 10){
+      n -= 10
+      document.getElementById("scoreThreshold").value = n/100
+    }
+  }
+
   function onChangeWithFaceLandmarks(e) {
     withFaceLandmarks = $(e.target).prop('checked')
   }

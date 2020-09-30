@@ -7,8 +7,8 @@ from scipy.spatial import distance
 from yolo_config import *
 from datetime import datetime
 from hashlib import sha256
-from on_chain import OnChain
-from off_chain import OffChain
+# from on_chain import OnChain
+# from off_chain import OffChain
 
 
 class Detector:
@@ -35,8 +35,8 @@ class Detector:
 
         ln = self.net.getLayerNames()
         self.ln = [ln[i[0] - 1] for i in self.net.getUnconnectedOutLayers()]
-        self.off_chain = OffChain()
-        self.on_chain = OnChain()
+        # self.off_chain = OffChain()
+        # self.on_chain = OnChain()
 
     @staticmethod
     def detect(frame, net, ln, person_idx=0):
@@ -137,14 +137,14 @@ class Detector:
 
 
             # On/Off chain stuff #
-            current_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-            insert_query = """INSERT INTO Distancing (Location, Local_Time, Violations) VALUES ({}, '{}', {})""".format(self.location, current_time, len(violate))
-            self.off_chain.insert(insert_query)
+            # current_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+            # insert_query = """INSERT INTO Distancing (Location, Local_Time, Violations) VALUES ({}, '{}', {})""".format(self.location, current_time, len(violate))
+            # self.off_chain.insert(insert_query)
 
-            select_query = """SELECT """
-            event = self.off_chain.select(select_query)
+            # select_query = """SELECT """
+            # event = self.off_chain.select(select_query)
 
-            event_str = event[0][0] + self.location + current_time + len(violate)
-            event_hash = sha256(event_str.encode()).hexdigest()
+            # event_str = event[0][0] + self.location + current_time + len(violate)
+            # event_hash = sha256(event_str.encode()).hexdigest()
         # connection.commit()
         # cursor.close()
