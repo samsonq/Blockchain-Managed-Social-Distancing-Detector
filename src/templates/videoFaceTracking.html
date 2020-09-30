@@ -77,7 +77,7 @@
       <!-- Distance meter -->
 
       <!-- fps_meter -->
-      <div id="fps_meter" class="model-section-1" style="padding-right:50px;">
+      <div id="fps_meter" class="model-section-1" style="padding: 0 50px;">
         <div>
           <label class="blue-text text-darken-1" for="time">Time:</label>
           <input disabled value="-" id="time" type="text" class="bold" style="color: #1de9b6; background-color: #1c1c1c; text-align: center;">
@@ -138,8 +138,7 @@
   let withBoxes = true
 
   function onIncreaseMinConfidence(e) {
-    console.log("increase")
-    var n = parseInt(document.getElementById("minConfidence").value) * 100
+    var n = parseFloat(document.getElementById("minConfidence").value) * 100
     if(n < 100){
       n += 10
       document.getElementById("minConfidence").value = n/100
@@ -152,7 +151,7 @@
   }
 
   function onDecreaseMinConfidence(e) {
-    var n = parseInt(document.getElementById("minConfidence").value) * 100
+    var n = parseFloat(document.getElementById("minConfidence").value) * 100
     if(n > 10){
       n -= 10
       document.getElementById("minConfidence").value = n/100
@@ -165,7 +164,7 @@
   }
 
   function onIncreaseScoreThreshold(e) {
-    var n = parseInt(document.getElementById("scoreThreshold").value) * 100
+    var n = parseFloat(document.getElementById("scoreThreshold").value) * 100
     if(n < 100){
       n += 10
       document.getElementById("scoreThreshold").value = n/100
@@ -178,7 +177,7 @@
   }
 
   function onDecreaseScoreThreshold(e) {
-    var n = parseInt(document.getElementById("scoreThreshold").value) * 100
+    var n = parseFloat(document.getElementById("scoreThreshold").value) * 100
     if(n > 10){
       n -= 10
       document.getElementById("scoreThreshold").value = n/100

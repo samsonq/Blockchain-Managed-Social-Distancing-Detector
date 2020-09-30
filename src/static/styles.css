@@ -57,7 +57,7 @@ input[type="file"]::-webkit-file-upload-button {
 
 .control-wrapper {
   display: flex;
-  margin-top: 15px;
+  margin: 15px auto;
 }
 
 .justify-center {
