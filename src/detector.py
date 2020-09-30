@@ -137,8 +137,8 @@ class Detector:
 
 
             # On/Off chain #
-            current_time = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-            insert_query = """INSERT INTO Distancing (Location, Local_Time, Violations) VALUES ({}, '{}', {})""".format(self.location, current_time, len(violate))
+            current_time = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+            insert_query = """INSERT INTO social_distancing (Location, Local_Time, Violations) VALUES ('{}', '{}', {})""".format(self.location, current_time, len(violate))
             self.off_chain.insert(insert_query)
 
             # select_query = """SELECT """
