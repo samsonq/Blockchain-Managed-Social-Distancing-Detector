@@ -10,7 +10,6 @@ contract offChain is Ownable, Destructible {
     using SafeMath for uint256;
     address public owner;
     uint public balance;
-    //string[] memory private event_hashes;
     mapping (string => address) private eventHashes;
 
     event Balance(uint amount, uint moneyNeeded);
@@ -20,8 +19,13 @@ contract offChain is Ownable, Destructible {
         owner = msg.sender;
     }
 
+    modifier onlyOwner() {
+        require(msg.sender == owner);
+        _;
+    }
+
     function _addEvent(string memory hash) public {
-        eventHashes.push(hash);
+        eventHashes[hash] = msg.sender;
     }
 
     function _verifyEvent(string eventInfo) public view returns(bool) {
@@ -31,5 +35,9 @@ contract offChain is Ownable, Destructible {
         } else {
             return false;
         }
+    }
+
+    function _retrieveCreator(string eventInfo) public view returns(address) {
+        return eventHashes[x];
     }
 }
