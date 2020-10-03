@@ -18,6 +18,7 @@ vs = None
 outputFrame = None
 lock = threading.Lock()
 web3 = Web3(Web3.HTTPProvider("https://mainnet.infura.io/v3/7fc9b313b47d488c97c52c3221344c04"))
+location = ""
 
 app = Flask(__name__)
 
@@ -36,6 +37,14 @@ def set_min_distance(distance):
     min_distance[0] = float(distance)
     print("set distance: " + str(distance))
     return Response(status = 200)
+
+@app.route("/get_location", methods=['GET'])
+def get_location():
+    return location
+
+@app.route("/get_min_distance", methods=['GET'])
+def get_min_distance():
+    return str(min_distance[0])
 
 @app.route("/social_distancing_tracker")
 def social_distancing_tracker():
@@ -92,7 +101,7 @@ def parse_args():
     ap = argparse.ArgumentParser()
     ap.add_argument("-i", "--input", type=str, default="",
                     help="path to (optional) input video file")
-    ap.add_argument("-l", "--location", type=str, default="",
+    ap.add_argument("-l", "--location", type=str, default="San Diego",
                     help="geo location of video feed")
     ap.add_argument("-o", "--output", type=str, default="",
                     help="path to (optional) output video file")
@@ -113,10 +122,11 @@ def main():
     """
     Runs social distancing detector.
     """
-    global vs
+    global vs, location
 
     args = parse_args()
-    social_distancing_detector = Detector(args["input"], args["output"], args["location"], args["display"])
+    location = args["location"]
+    social_distancing_detector = Detector(args["input"], args["output"], location, args["display"])
 
     if args["web"] == 1:
         vs = cv2.VideoCapture(args["input"] if args["input"] else 0)
