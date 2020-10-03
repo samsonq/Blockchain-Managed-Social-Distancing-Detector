@@ -25,8 +25,8 @@ async function requestExternalImage(imageUrl) {
 function renderNavBar(navbarId, exampleUri) {
   const examples = [
     {
-      uri: 'video_face_tracking',
-      name: 'Video Face Tracking'
+      uri: 'social_distancing_tracker',
+      name: 'Social Distancing Tracker'
     }
   ]
 

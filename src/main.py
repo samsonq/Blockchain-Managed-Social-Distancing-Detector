@@ -23,7 +23,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return redirect(url_for("video_face_tracking"))
+    return redirect(url_for("social_distancing_tracker"))
 
 @app.route("/set_confidence/<confidence>", methods=['POST'])
 def set_confidence(confidence):
@@ -37,9 +37,9 @@ def set_min_distance(distance):
     print("set distance: " + str(distance))
     return Response(status = 200)
 
-@app.route("/video_face_tracking")
-def video_face_tracking():
-    return render_template("videoFaceTracking.html")
+@app.route("/social_distancing_tracker")
+def social_distancing_tracker():
+    return render_template("socialDistancingTracker.html")
 
 @app.route("/video_feed")
 def video_feed():
