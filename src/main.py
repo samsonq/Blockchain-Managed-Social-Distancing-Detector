@@ -45,6 +45,7 @@ def social_distancing_tracker():
 def video_feed():
     return Response(generate(), mimetype="multipart/x-mixed-replace; boundary=frame")
 
+
 def update_video(detector, frame_rate):
     global vs, outputFrame, lock
     
@@ -67,6 +68,7 @@ def update_video(detector, frame_rate):
 
             with lock:
                 outputFrame = frame.copy()
+
 
 def generate():
     global outputFrame, lock

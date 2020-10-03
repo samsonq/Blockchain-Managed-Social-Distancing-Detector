@@ -29,8 +29,8 @@ class Detector:
 
         if USE_GPU:
             print("[INFO] setting preferable backend and target to CUDA...")
-            net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
-            net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
+            self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+            self.net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA)
 
         ln = self.net.getLayerNames()
         self.ln = [ln[i[0] - 1] for i in self.net.getUnconnectedOutLayers()]
@@ -108,6 +108,15 @@ class Detector:
             cv2.circle(frame, (cX, cY), 5, color, 1)
         text = "Social Distancing Violations: {}".format(len(violate))
         cv2.putText(frame, text, (10, frame.shape[0] - 25), cv2.FONT_HERSHEY_SIMPLEX, 0.85, (0, 0, 255), 3)
+
+        current_time = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+        insert_query = """INSERT INTO social_distancing (Location, Local_Time, Violations) VALUES ('{}', '{}', {})""".format(
+            self.location, current_time, len(violate))
+        self.off_chain.insert(insert_query)
+
+        select_query = """SELECT * FROM social_distancing ORDER BY Event_ID DESC LIMIT 1"""
+        event = self.off_chain.select(select_query)
+        self.on_chain.store_hash(event[0][3], self.location, current_time, str(len(violate)))
         return (grabbed, frame, violate)
 
     def detect_social_distancing(self):
