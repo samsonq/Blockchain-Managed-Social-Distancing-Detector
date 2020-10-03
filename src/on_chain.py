@@ -1,5 +1,6 @@
 import json
 from web3 import Web3
+from hashlib import sha256
 
 
 address = ""
@@ -14,3 +15,23 @@ class OnChain:
         self.abi = abi
         self.bin = bin
 
+    @staticmethod
+    def sha256_hash(event_id, location, time, violations):
+        """
+        Performs SHA256 hash to generate a string output.
+        :return: hash of inputs
+        """
+        event_str = event_id + location + time + violations
+        return sha256(event_str.encode()).hexdigest()
+
+    def store_hash(self, event_id, location, time, violations):
+        """
+        Stores event-generated hash on-chain.
+        :param event_id:
+        :param location:
+        :param time:
+        :param violations:
+        :return:
+        """
+        event_hash = self.sha256_hash(event_id, location, time, violations)
+        ...

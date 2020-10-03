@@ -33,3 +33,9 @@ class OffChain:
         """
         self.cursor.execute(query)
         return self.cursor.fetchall()
+
+    def close_connection(self):
+        """
+        Close connection to database.
+        """
+        self.cursor.close()
