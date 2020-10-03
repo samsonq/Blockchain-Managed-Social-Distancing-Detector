@@ -6,7 +6,6 @@ import imutils
 from scipy.spatial import distance
 from yolo_config import *
 from datetime import datetime
-from hashlib import sha256
 from on_chain import OnChain
 from off_chain import OffChain
 
@@ -36,7 +35,7 @@ class Detector:
         ln = self.net.getLayerNames()
         self.ln = [ln[i[0] - 1] for i in self.net.getUnconnectedOutLayers()]
         self.off_chain = OffChain()
-        #self.on_chain = OnChain()
+        self.on_chain = OnChain()
 
     @staticmethod
     def detect(frame, net, ln, person_idx=0):
@@ -141,10 +140,12 @@ class Detector:
             insert_query = """INSERT INTO social_distancing (Location, Local_Time, Violations) VALUES ('{}', '{}', {})""".format(self.location, current_time, len(violate))
             self.off_chain.insert(insert_query)
 
-            # select_query = """SELECT """
-            # event = self.off_chain.select(select_query)
+            select_query = """SELECT * FROM social_distancing ORDER BY Event_ID DESC LIMIT 1"""
+            event = self.off_chain.select(select_query)
+            self.on_chain.store_hash(event[0][3], self.location, current_time, str(len(violate)))
 
             # event_str = event[0][0] + self.location + current_time + len(violate)
             # event_hash = sha256(event_str.encode()).hexdigest()
-        # connection.commit()
-        # cursor.close()
+
+        self.off_chain.close_connection()
+        return
