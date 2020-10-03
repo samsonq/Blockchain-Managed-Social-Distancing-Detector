@@ -17,7 +17,7 @@ The use of blockchain ledgers and smart contracts preserve the integrity of the 
 Deploying the detection model to video feed of webcams and record social distancing. The detections made by the model are flowing through the blockchain and good/bad distancing are recorded.
 
 ## Screenshots
-![detector](./screenshots/yolo_detector.png)
+![detector](./screenshots/detector.png)
 
 ## How to use
 Navigate to the src folder and run main.py (Use --help to see the full list of options): 
