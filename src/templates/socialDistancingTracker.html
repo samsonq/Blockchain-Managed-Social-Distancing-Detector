@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Geolocation</title>
+  <title>Social Distancing Tracker</title>
   <script src="/static/face-api.js"></script>
   <script src="/static/commons.js"></script>
   <script src="/static/faceDetectionControls.js"></script>
@@ -17,24 +17,15 @@
   <div class="page-container blue-text text-darken-1">
 
     <div style="position: relative" class="video-section mx-auto">
-      <!--<video src="/static/bbt.MOV" id="inputVideo" autoplay muted loop playsinline></video>-->
       <img src="{{ url_for('video_feed') }}">
       <canvas id="overlay" />
     </div>
 
     <div class="control-wrapper">
       <div class="side-by-side model-section">
-        <!-- face_detector_selection_control -->
         <div class="selection-wrapper">
-
-          <!-- <div id="face_detector_selection_control" class="input-field"> -->
-          <!-- </div> -->
-          <!-- face_detector_selection_control -->
-
-          <!-- Input Size Selection -->
-          <!-- <div class="input-field"> -->
           <label class="blue-text text-darken-1">Minimum Social Distance:</label>
-          <input value="Minimum Social Distance" id="distance" type="text" class="bold" style="color: #1de9b6; background-color: #1c1c1c; text-align: center;">
+          <input value="" id="distance" type="text" class="bold" style="color: #1de9b6; background-color: #1c1c1c; text-align: center;">
           <!-- Input Size Selection -->
 
         </div>
@@ -42,15 +33,13 @@
 
       <!-- Distance meter -->
       <div class="distance-meter model-section-2" style="font-size: 30px;">
-        <!-- <span class="font-italic font-12 color-grey">(For demo purpose only. </span>
-        <span class="font-italic font-12 color-grey">Measured with Euclidean Distance)</span> -->
         <div id="distance-alert" class="mt-2 px-5 text-red text-center font-bold font-22 break-word">
         </div>
       </div>
       <!-- Distance meter -->
 
       <!-- fps_meter -->
-      <div id="fps_meter" class="model-section-1" style="padding: 0 50px;">
+      <div id="fps_meter" class="model-section-1" style="padding: 0 0px;">
         <div>
           <label class="blue-text text-darken-1" for="location">Location:</label>
           <input value="Video Location" id="location" type="text" class="bold" style="color: #1de9b6; background-color: #1c1c1c; text-align: center;">
@@ -267,6 +256,22 @@
   }
 
   function updateResults() { }
+
+  $.ajax({
+      type: "GET",
+      url: "/get_location",
+      success: function(data) {
+        document.getElementById("location").value = data;
+      } 
+    })
+
+  $.ajax({
+    type: "GET",
+    url: "/get_min_distance",
+    success: function(data) {
+      document.getElementById("distance").value = data;
+    } 
+  })
 
   $(document).ready(function () {
     renderNavBar('#navbar', 'social_distancing_tracker')
