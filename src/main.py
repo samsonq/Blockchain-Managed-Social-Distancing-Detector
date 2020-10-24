@@ -10,7 +10,7 @@ import argparse
 from detector import Detector
 from imutils.video import VideoStream
 from flask import Flask, Response, url_for, redirect, render_template
-from yolo_config import *
+from yolo_config import min_conf, min_distance
 from web3 import Web3
 warnings.filterwarnings("ignore")
 
@@ -22,9 +22,11 @@ location = ""
 
 app = Flask(__name__)
 
+
 @app.route("/")
 def index():
     return redirect(url_for("social_distancing_tracker"))
+
 
 @app.route("/set_confidence/<confidence>", methods=['POST'])
 def set_confidence(confidence):
@@ -32,23 +34,28 @@ def set_confidence(confidence):
     print("set confidence: " + str(confidence))
     return Response(status = 200)
 
+
 @app.route("/set_min_distance/<distance>", methods=['POST'])
 def set_min_distance(distance):
     min_distance[0] = float(distance)
     print("set distance: " + str(distance))
     return Response(status = 200)
 
+
 @app.route("/get_location", methods=['GET'])
 def get_location():
     return location
+
 
 @app.route("/get_min_distance", methods=['GET'])
 def get_min_distance():
     return str(min_distance[0])
 
+
 @app.route("/social_distancing_tracker")
 def social_distancing_tracker():
     return render_template("socialDistancingTracker.html")
+
 
 @app.route("/video_feed")
 def video_feed():
@@ -89,7 +96,7 @@ def generate():
             (flag, encodedImage) = cv2.imencode(".jpg", outputFrame)
             if not flag:
                 continue
-        yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n')
+        yield b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + bytearray(encodedImage) + b'\r\n'
 
 
 def parse_args():

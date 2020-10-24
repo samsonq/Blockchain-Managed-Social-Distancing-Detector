@@ -12,6 +12,11 @@ class Verification:
         self.off_chain = OffChain()
 
     def retrieve_all_verified_events(self):
+        """
+        Verify events recorded in off-chain database and return tables of verified and
+        unverified events according to on-chain storage.
+        :return: verified events, unverified events
+        """
         unverified_events = []
         select_query = """SELECT * FROM social_distancing"""
         retrieved_events = self.off_chain.select(select_query)

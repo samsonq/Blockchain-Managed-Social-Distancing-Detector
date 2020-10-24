@@ -11,7 +11,10 @@ contract_abi = json.loads('[{"inputs":[],"payable":false,"stateMutability":"nonp
 
 
 class OnChain:
-
+    """
+    Instantiate and deploy smart contracts to record event hashes. Manages writing of hashes on-chain
+    and verification of events with off-chain data.
+    """
     def __init__(self, address=contract_address, abi=contract_abi, provider=ganache_url):
         self.web3 = Web3(Web3.HTTPProvider(provider))
         self.abi = abi
